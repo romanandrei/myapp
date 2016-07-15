@@ -214,9 +214,9 @@ def RaitingViewSet(request):
                     data['rating'])>0 and float(data['rating'])<=5.0 and \
                     len(ids)==2 and menu_id.isnumeric() and \
                     order_id.isnumeric() :
-                import ipdb; ipdb.set_trace(); 
+                # import ipdb; ipdb.set_trace(); 
                 order= Order.objects.get(id=    order_id)
-                if str(order_id)==str(order.id) and order.status !=ORDER_ENDED:
+                if str(order_id)==str(order.id) :
                     order.raiting=data['rating']
                     order.status=ORDER_ENDED
                     order.save()
@@ -229,7 +229,7 @@ def RaitingViewSet(request):
              return Response(
                 {"details":str(err)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(
-            {"details":"Comanda finalizata cu succes"},status=status.HTTP_200_OK)       
+            "Comanda finalizata cu succes",status=status.HTTP_200_OK)       
 
 
 
