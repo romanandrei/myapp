@@ -13,6 +13,9 @@ from restaurant.serializers import MenuSerializer, OrderSerializer,InfoSerialize
 from datetime import datetime, timedelta
 from django.http import HttpResponseRedirect
 from django.core.mail import send_mail, BadHeaderError
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+
 
 
 # from snippets.models import Snippet
@@ -20,7 +23,6 @@ from django.core.mail import send_mail, BadHeaderError
 # from django.http import Http404
 # from rest_framework.views import APIView
 # from rest_framework import status
-
 
 
 
@@ -54,11 +56,31 @@ def detail(request, menu_id):
         "order_list":order_list,
         "average":average
     }
-    # import ipdb; ipdb.set_trace();
+    # import ipdb; ipdb.MenuViewSet_trace();
     return HttpResponse(template.render(context, request))
 
 def index_o(request):
-    all_orders=Order.objects.all()
+    all_orders_list=Order.objects.all()
+
+
+
+    paginator = Paginator(all_orders_list, 20) # Show 25 contacts per page
+
+    page = request.GET.get('page')
+    try:
+        all_orders = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        all_orders = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        all_orders = paginator.page(paginator.num_pages)
+
+
+
+
+
+
     template=loader.get_template('restaurant/order_list.html')
 
     context={
@@ -69,6 +91,8 @@ def index_o(request):
 def detail_o(request, order_id):
     #import ipdb; ipdb.set_trace();
     order=Order.objects.get(pk=order_id)
+
+
     template=loader.get_template('restaurant/view_order.html')
     context={
         "order":order,
@@ -122,7 +146,6 @@ def post_order(request):
         if form.is_valid():
             # import  ipdb; ipdb.set_trace();
             order = form.save()
-
             send_m(order)
         else:
             # pass
@@ -190,12 +213,12 @@ def InfoViewSet(request):
                     'sir': sir1
                     }
                 else:
-                    return Response({"details":"Meniul dat nu corespunde"}, \
+                    return Response("Meniul dat nu corespunde", \
                         status=status.HTTP_400_BAD_REQUEST)
             else:
-                return Response({"details":"Meniul dat nu corespunde"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response("Meniul dat nu corespunde", status=status.HTTP_400_BAD_REQUEST)
         except Exception as err:
-            return Response({"details":str(err)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(str(err), status=status.HTTP_400_BAD_REQUEST)
         return Response(informatii,status=status.HTTP_200_OK)
         
 
@@ -221,15 +244,13 @@ def RaitingViewSet(request):
                     order.status=ORDER_ENDED
                     order.save()
                 else:
-                    return Response({"details":"Rating invalid"}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response("Rating invalid", status=status.HTTP_400_BAD_REQUEST)
             else:
-                return Response({"details":"Rating invalid"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response("Rating invalid", status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as err:
-             return Response(
-                {"details":str(err)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(
-            "Comanda finalizata cu succes",status=status.HTTP_200_OK)       
+             return Response(str(err), status=status.HTTP_400_BAD_REQUEST)
+        return Response("Comanda finalizata cu succes",status=status.HTTP_200_OK)       
 
 
 
@@ -247,12 +268,3 @@ def send_m(order):
 
 
 
-def send_mail(order):
-    subject = "Order confirmation"  
-    msg = "Va multumim pentru comanda facuta " + order.name + \
-        ". Ati comandat urmatorul meniu :" + order.title.title + \
-        " si contine: Felul 1 - " + order.title.dish1 + ", Felul 2 - " + \
-        order.title.dish2 +", Desert - " + order.title.desert + \
-        ". Numarul dvs de comanda este :" + str(order.title.pk) +"-" + \
-        str(order.pk)
-    send_mail(subject, msg, "testlunch72@gmail.com", [order.email])

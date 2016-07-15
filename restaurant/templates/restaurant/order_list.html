@@ -1,8 +1,29 @@
 {% extends 'restaurant/index.html' %}   
 {% block content %}
+         <div>
          <ul>
             {% for order in all_orders%}
-            <li><a href="{% url 'restaurant:detail_o' order.pk %}"> {{order.name}}</a></li>
+            <li><a href="{% url 'restaurant:detail_o' order.pk %}"> {{order.name}} - {{order.title}}</a></li>
             {%endfor%}
+
         </ul> 
+
+<div class="pagination">
+    <span class="step-links">
+        {% if all_orders.has_previous %}
+            <a href="?page={{ all_orders.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ all_orders.number }} of {{ all_orders.paginator.num_pages }}.
+        </span>
+
+        {% if all_orders.has_next %}
+            <a href="?page={{ all_orders.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
+</div>
+        
+
 {% endblock %}
