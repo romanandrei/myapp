@@ -247,3 +247,12 @@ def send_m(order):
 
 
 
+def send_mail(order):
+    subject = "Order confirmation"  
+    msg = "Va multumim pentru comanda facuta " + order.name + \
+        ". Ati comandat urmatorul meniu :" + order.title.title + \
+        " si contine: Felul 1 - " + order.title.dish1 + ", Felul 2 - " + \
+        order.title.dish2 +", Desert - " + order.title.desert + \
+        ". Numarul dvs de comanda este :" + str(order.title.pk) +"-" + \
+        str(order.pk)
+    send_mail(subject, msg, "testlunch72@gmail.com", [order.email])
