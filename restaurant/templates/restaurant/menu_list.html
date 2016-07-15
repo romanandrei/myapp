@@ -1,0 +1,21 @@
+{% extends 'restaurant/index.html' %}   
+{% block content %}
+         <ul>
+                     <table style="width:70%">
+			  <tr>
+			    <th>Data</th>
+			    <th>Titlul meniului</th>
+				<th>Accesare Meniu</th>
+			  </tr>
+            {% for menu in all_menus%}
+			  <tr>
+			    <td>{{menu.date_day}}</td>
+			    <td>{{menu.title}}</td>
+
+			    <td><a href="{% url 'restaurant:detail' menu.pk %}">Vezi Meniu</a></td>
+			  </tr>
+			{%endfor%}
+			</table>
+        </ul> 
+
+{% endblock %}	
